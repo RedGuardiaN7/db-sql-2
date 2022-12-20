@@ -1,0 +1,91 @@
+Group by:
+1. Contare quanti iscritti ci sono stati ogni anno
+
+SELECT COUNT(id) AS 'Studenti iscritti', YEAR(enrolment_date) AS 'Anno di iscrizione'
+FROM students
+GROUP BY YEAR(enrolment_date)
+ORDER BY YEAR(enrolment_date) DESC
+
+2. Contare gli insegnanti che hanno l'ufficio nello stesso edificio
+
+SELECT COUNT(id) AS 'Professori con l''ufficio condiviso', office_address AS 'Indirizzo ufficio'
+FROM teachers
+GROUP BY office_address
+
+3. Calcolare la media dei voti di ogni appello d'esame
+
+SELECT exam_id AS 'Id appello', AVG(vote) AS 'Media voti'
+FROM exam_student
+GROUP BY exam_id
+
+4. Contare quanti corsi di laurea ci sono per ogni dipartimento
+
+SELECT departments.name AS 'Dipartimento', COUNT(degrees.id) AS 'Numeri di corsi di laurea'
+FROM degrees
+JOIN departments
+on degrees.department_id = departments.id
+GROUP BY departments.name
+
+Join:
+1. Selezionare tutti gli studenti iscritti al Corso di Laurea in Economia
+
+SELECT degrees.name AS 'Corso di laurea', students.name, students.surname, students.registration_number AS 'Numero matricola'
+from degrees
+JOIN students
+ON degrees.id = students.degree_id
+WHERE degrees.id = 53
+
+2. Selezionare tutti i Corsi di Laurea Magistrale del Dipartimento di Neuroscienze
+
+SELECT degrees.name, degrees.level, degrees.address, degrees.email, degrees.website, departments.name AS 'Dipartimento'
+from degrees
+RIGHT JOIN departments
+ON degrees.department_id = departments.id
+WHERE departments.id = 7 AND degrees.level = 'magistrale'
+
+3. Selezionare tutti i corsi in cui insegna Fulvio Amato (id=44)
+
+SELECT courses.id, courses.name, courses.description, courses.period, courses.year, courses.cfu, teachers.name, teachers.surname, teachers.email, teachers.office_address
+FROM courses
+LEFT JOIN course_teacher
+ON courses.id = course_teacher.course_id
+LEFT JOIN teachers
+ON course_teacher.teacher_id = teachers.id
+WHERE teacher_id = 44
+
+4. Selezionare tutti gli studenti con i dati relativi al corso di laurea a cui sono iscritti e il
+relativo dipartimento, in ordine alfabetico per cognome e nome
+
+SELECT students.id, students.name, students.surname, students.registration_number, degrees.name, degrees.level, departments.name
+FROM students
+LEFT JOIN degrees
+ON students.degree_id = degrees.id
+LEFT JOIN departments
+ON degrees.department_id = departments.id
+ORDER BY students.surname, students.name
+
+5. Selezionare tutti i corsi di laurea con i relativi corsi e insegnanti
+
+SELECT degrees.id, degrees.name, degrees.level, courses.id AS 'ID corso', courses.name AS 'Nome corso', courses.cfu, teachers.name, teachers.surname, teachers.email
+FROM degrees
+JOIN courses
+ON degrees.id = courses.degree_id
+JOIN course_teacher
+ON courses.id = course_teacher.course_id
+JOIN teachers
+ON course_teacher.teacher_id = teachers.id
+
+6. Selezionare tutti i docenti che insegnano nel Dipartimento di Matematica (54)
+
+SELECT teachers.id, teachers.name, teachers.surname
+FROM departments
+LEFT JOIN degrees
+ON departments.id = degrees.department_id
+LEFT JOIN courses
+ON degrees.id = courses.degree_id
+LEFT JOIN course_teacher
+ON courses.id = course_teacher.course_id
+LEFT JOIN teachers
+ON course_teacher.teacher_id = teachers.id
+WHERE departments.id = 5
+GROUP BY teachers.id, teachers.surname, teachers.namesi
